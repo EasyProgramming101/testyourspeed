@@ -3,20 +3,999 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Science Speed Test Topic Selector</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Computer Science Quiz Speed Test</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .quiz-intro {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .topic-selection {
+            margin: 20px 0;
+        }
+
+        .topic-selector {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            font-size: 16px;
+            color: var(--dark-color);
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .start-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .start-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .quiz-container {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-count, .score {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .timer-container {
+            width: 100%;
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--accent-color);
+            transition: width 0.1s linear;
+        }
+
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 15px;
+            background-color: var(--light-color);
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background-color: #e3e8ec;
+            border-color: var(--primary-color);
+        }
+
+        .option.correct {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .option.incorrect {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .option.disabled {
+            pointer-events: none;
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .results h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .restart-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .upgrade-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .upgrade-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .upgrade-content h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .close-upgrade {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Styling for disabled topics */
+        option.disabled {
+            color: #bdc3c7;
+            font-style: italic;
+        }
+
+        @media (min-width: 768px) {
+            .options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Computer Science Speed Test</h1>
-        <select id="topicSelect">
-            <option value="">Select a Topic</option>
-            <option value="https://testyourspeed.github.io/datastructures/">Data Structures</option>
-            <option value="https://testyourspeed.github.io/algorithms/">Algorithms</option>
-            <option value="https://testyourspeed.github.io/operatingsystems/">Operating Systems</option>
-        </select>
-        <button id="goButton" disabled>Go to Test</button>
+        <header>
+            <h1>Computer Science Quiz Speed Test</h1>
+            <p>Test your knowledge with quick-fire computer science questions!</p>
+        </header>
+
+        <div class="quiz-intro">
+            <h2>Ready to test your computer science knowledge?</h2>
+            <p>Select a topic and answer 10 random questions. You have 20 seconds for each question!</p>
+            
+            <div class="topic-selection">
+                <label for="topic">Select Topic:</label>
+                <select id="topic" class="topic-selector">
+                    <option value="" disabled selected>Choose a topic...</option>
+                    <option value="dataStructures">Data Structures</option>
+                    <option value="algorithms">Algorithms</option>
+                    <option value="operatingSystems">Operating Systems</option>
+                    <option value="databases" disabled>Databases</option>
+                    <option value="networking" disabled>Computer Networking</option>
+                    <option value="computerArchitecture" disabled>Computer Architecture</option>
+                    <option value="softwareEngineering" disabled>Software Engineering</option>
+                </select>
+            </div>
+            
+            <button id="start-btn" class="start-btn" disabled>Start Quiz</button>
+        </div>
+
+        <div id="quiz-container" class="quiz-container">
+            <div class="quiz-header">
+                <div class="question-count">Question <span id="current">1</span>/<span id="total">10</span></div>
+                <div class="score">Score: <span id="score">0</span></div>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+            
+            <div id="question" class="question"></div>
+            
+            <div id="options" class="options"></div>
+        </div>
+
+        <div id="results" class="results">
+            <h2>Quiz Complete!</h2>
+            <div class="score-display">Your score: <span id="final-score">0</span> out of 10</div>
+            <button id="restart-btn" class="restart-btn">Take Another Quiz</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <div id="upgrade-modal" class="upgrade-modal">
+        <div class="upgrade-content">
+            <h2>UPGRADE TO PRO</h2>
+            <p>This topic is only available in the PRO version.</p>
+            <button id="close-upgrade" class="close-upgrade">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const topicSelector = document.getElementById('topic');
+        const startButton = document.getElementById('start-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizIntro = document.querySelector('.quiz-intro');
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('options');
+        const currentQuestionElement = document.getElementById('current');
+        const totalQuestionsElement = document.getElementById('total');
+        const scoreElement = document.getElementById('score');
+        const timerBar = document.getElementById('timer-bar');
+        const resultsContainer = document.getElementById('results');
+        const finalScoreElement = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-btn');
+        const upgradeModal = document.getElementById('upgrade-modal');
+        const closeUpgradeButton = document.getElementById('close-upgrade');
+
+        // Quiz state
+        let currentQuestion = 0;
+        let score = 0;
+        let timer;
+        let timeLeft;
+        let questions = [];
+        let answered = false;
+
+        // Question Banks
+        const questionBanks = {
+            dataStructures: [
+                {
+                    question: "Which data structure follows the LIFO (Last In First Out) principle?",
+                    options: [
+                        "Queue",
+                        "Stack",
+                        "Linked List",
+                        "Heap"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which of these is NOT a linear data structure?",
+                    options: [
+                        "Array",
+                        "Linked List",
+                        "Tree",
+                        "Stack"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What is the time complexity of searching for an element in a hash table (average case)?",
+                    options: [
+                        "O(n)",
+                        "O(log n)",
+                        "O(n log n)",
+                        "O(1)"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "Which data structure is best suited for implementing a priority queue?",
+                    options: [
+                        "Array",
+                        "Linked List",
+                        "Heap",
+                        "Stack"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following is a self-balancing binary search tree?",
+                    options: [
+                        "B-tree",
+                        "AVL tree",
+                        "Binary tree",
+                        "Trie"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What data structure would be most efficient for implementing a dictionary?",
+                    options: [
+                        "Array",
+                        "Linked List",
+                        "Hash Table",
+                        "Queue"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What is the worst-case time complexity for insertion in a binary heap?",
+                    options: [
+                        "O(1)",
+                        "O(log n)",
+                        "O(n)",
+                        "O(n log n)"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which data structure is used to represent hierarchical relationships?",
+                    options: [
+                        "Array",
+                        "Stack",
+                        "Queue",
+                        "Tree"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "In a doubly linked list, each node contains:",
+                    options: [
+                        "Data and one pointer",
+                        "Data and two pointers",
+                        "Only data",
+                        "Only pointers"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the primary disadvantage of using an array compared to a linked list?",
+                    options: [
+                        "Slower access time",
+                        "Higher memory usage",
+                        "Fixed size",
+                        "Complexity of implementation"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which of the following is NOT a common operation performed on a queue?",
+                    options: [
+                        "Enqueue",
+                        "Dequeue",
+                        "Peek",
+                        "Push"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "Which data structure is best for implementing a FIFO (First In First Out) system?",
+                    options: [
+                        "Stack",
+                        "Queue",
+                        "Binary Search Tree",
+                        "Heap"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is a trie data structure primarily used for?",
+                    options: [
+                        "Sorting numbers",
+                        "Managing database operations",
+                        "Storing and retrieving strings",
+                        "Processing images"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "The maximum number of children a binary tree node can have is:",
+                    options: [
+                        "1",
+                        "2",
+                        "3",
+                        "Unlimited"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which data structure would you use to check if a syntax has balanced parentheses?",
+                    options: [
+                        "Queue",
+                        "Stack",
+                        "Linked List",
+                        "Array"
+                    ],
+                    answer: 1
+                }
+            ],
+            algorithms: [
+                {
+                    question: "What is the time complexity of quicksort in the worst case?",
+                    options: [
+                        "O(n)",
+                        "O(log n)",
+                        "O(n log n)",
+                        "O(n²)"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "Which algorithm is used to find the shortest path in a weighted graph?",
+                    options: [
+                        "BFS (Breadth-First Search)",
+                        "DFS (Depth-First Search)",
+                        "Dijkstra's Algorithm",
+                        "Bubble Sort"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which sorting algorithm has the best average-case time complexity?",
+                    options: [
+                        "Bubble Sort",
+                        "Insertion Sort",
+                        "Selection Sort",
+                        "Merge Sort"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "Which of these is a divide-and-conquer algorithm?",
+                    options: [
+                        "Bubble Sort",
+                        "Insertion Sort",
+                        "Merge Sort",
+                        "Selection Sort"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What does the 'Big O' notation represent?",
+                    options: [
+                        "Best case complexity",
+                        "Average case complexity",
+                        "Worst case complexity",
+                        "All of the above"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which algorithm is used to find the minimum spanning tree of a graph?",
+                    options: [
+                        "Dijkstra's Algorithm",
+                        "Kruskal's Algorithm",
+                        "Floyd-Warshall Algorithm",
+                        "Quick Sort"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Binary search works on which type of data?",
+                    options: [
+                        "Sorted data",
+                        "Unsorted data",
+                        "Both sorted and unsorted data",
+                        "None of the above"
+                    ],
+                    answer: 0
+                },
+                {
+                    question: "What approach does dynamic programming use to solve problems?",
+                    options: [
+                        "Greedy approach",
+                        "Divide and conquer",
+                        "Bottom-up approach with memoization",
+                        "Randomized approach"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which algorithm is used for string pattern matching?",
+                    options: [
+                        "Quicksort",
+                        "KMP (Knuth-Morris-Pratt) Algorithm",
+                        "Dijkstra's Algorithm",
+                        "Merge Sort"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the space complexity of breadth-first search?",
+                    options: [
+                        "O(1)",
+                        "O(log n)",
+                        "O(n)",
+                        "O(n²)"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which of these algorithms is used for topological sorting of a graph?",
+                    options: [
+                        "BFS",
+                        "DFS",
+                        "Dijkstra's Algorithm",
+                        "Floyd-Warshall Algorithm"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the time complexity of binary search?",
+                    options: [
+                        "O(1)",
+                        "O(log n)",
+                        "O(n)",
+                        "O(n log n)"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which of these is an example of a greedy algorithm?",
+                    options: [
+                        "Merge Sort",
+                        "Binary Search",
+                        "Huffman Coding",
+                        "Depth-First Search"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What technique does the A* search algorithm use to improve performance?",
+                    options: [
+                        "Dynamic programming",
+                        "Heuristic evaluation",
+                        "Random sampling",
+                        "Memoization"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the primary goal of a hashing function?",
+                    options: [
+                        "To sort data efficiently",
+                        "To compress data",
+                        "To map data to a fixed-size array",
+                        "To encrypt data securely"
+                    ],
+                    answer: 2
+                }
+            ],
+            operatingSystems: [
+                {
+                    question: "Which scheduling algorithm assigns the CPU to the process with the shortest estimated processing time first?",
+                    options: [
+                        "FCFS (First Come First Served)",
+                        "Round Robin",
+                        "SJF (Shortest Job First)",
+                        "Priority Scheduling"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What is thrashing in an operating system?",
+                    options: [
+                        "A type of computer virus",
+                        "Excessive paging causing performance degradation",
+                        "A method of securing file systems",
+                        "The process of clearing RAM"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What does a semaphore do in the context of process synchronization?",
+                    options: [
+                        "Allocates memory",
+                        "Controls access to resources",
+                        "Schedules processes",
+                        "Manages file systems"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the purpose of a page table in virtual memory systems?",
+                    options: [
+                        "To store frequently accessed files",
+                        "To map virtual addresses to physical addresses",
+                        "To schedule processes",
+                        "To manage device drivers"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following is a solution to the critical section problem?",
+                    options: [
+                        "Virtual memory",
+                        "Demand paging",
+                        "Mutual exclusion",
+                        "Time-sharing"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What is a deadlock in an operating system?",
+                    options: [
+                        "When a process is terminated abnormally",
+                        "When two or more processes are unable to proceed because each is waiting for resources held by others",
+                        "When the CPU is idle for too long",
+                        "When virtual memory is exhausted"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which memory allocation method suffers from external fragmentation?",
+                    options: [
+                        "Paging",
+                        "Segmentation",
+                        "Virtual memory",
+                        "Swapping"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the purpose of a context switch in an operating system?",
+                    options: [
+                        "To switch between user mode and kernel mode",
+                        "To save the state of a process and load the state of another",
+                        "To translate virtual addresses to physical addresses",
+                        "To allocate CPU time to processes"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "What is the primary function of an operating system's kernel?",
+                    options: [
+                        "To provide a user interface",
+                        "To manage hardware resources",
+                        "To run user applications",
+                        "To connect to the internet"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which scheduling algorithm uses time slices to ensure fair CPU allocation?",
+                    options: [
+                        "FCFS (First Come First Served)",
+                        "SJF (Shortest Job First)",
+                        "Round Robin",
+                        "Priority Scheduling"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "What is a process in the context of an operating system?",
+                    options: [
+                        "A program in execution",
+                        "A section of memory",
+                        "A hardware component",
+                        "An algorithm for scheduling"
+                    ],
+                    answer: 0
+                },
+                {
+                    question: "What is the purpose of the fork() system call?",
+                    options: [
+                        "To terminate a process",
+                        "To create a new process",
+                        "To allocate memory",
+                        "To open a file"
+                    ],
+                    answer: 1
+                },
+                {
+                    question: "Which of the following is NOT a common process state?",
+                    options: [
+                        "Running",
+                        "Ready",
+                        "Blocked",
+                        "Compiling"
+                    ],
+                    answer: 3
+                },
+                {
+                    question: "What does the 'dirty bit' indicate in a page table entry?",
+                    options: [
+                        "The page has been accessed",
+                        "The page is corrupted",
+                        "The page has been modified",
+                        "The page is unavailable"
+                    ],
+                    answer: 2
+                },
+                {
+                    question: "Which of these is an advantage of a microkernel architecture?",
+                    options: [
+                        "Better performance",
+                        "Easier to extend and maintain",
+                        "Less memory usage",
+                        "Faster boot time"
+                    ],
+                    answer: 1
+                }
+            ]
+        };
+
+        // Event Listeners
+        topicSelector.addEventListener('change', handleTopicSelection);
+        startButton.addEventListener('click', startQuiz);
+        restartButton.addEventListener('click', restartQuiz);
+        closeUpgradeButton.addEventListener('click', closeUpgradeModal);
+
+        // Disable non-clickable options
+        const disabledOptions = Array.from(topicSelector.options).filter(option => option.disabled);
+        disabledOptions.forEach(option => {
+            option.classList.add('disabled');
+            option.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                if (this.value && this.disabled) {
+                    showUpgradeModal();
+                }
+                return false;
+            });
+        });
+
+        // Functions
+        function handleTopicSelection() {
+            if (topicSelector.value) {
+                startButton.disabled = false;
+            } else {
+                startButton.disabled = true;
+            }
+        }
+
+        function showUpgradeModal() {
+            upgradeModal.style.display = 'flex';
+        }
+
+        function closeUpgradeModal() {
+            upgradeModal.style.display = 'none';
+        }
+
+        function startQuiz() {
+            // Reset quiz state
+            currentQuestion = 0;
+            score = 0;
+            scoreElement.textContent = '0';
+            
+            // Get selected topic
+            const topic = topicSelector.value;
+            
+            // Select 10 random questions from the topic
+            const allQuestions = questionBanks[topic];
+            questions = getRandomQuestions(allQuestions, 10);
+            
+            // Hide intro, show quiz
+            quizIntro.style.display = 'none';
+            quizContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            // Load first question
+            loadQuestion(currentQuestion);
+        }
+
+        function getRandomQuestions(questions, count) {
+            const shuffled = [...questions].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function loadQuestion(index) {
+            if (index >= questions.length) {
+                showResults();
+                return;
+            }
+            
+            answered = false;
+            const question = questions[index];
+            
+            // Update question counter
+            currentQuestionElement.textContent = index + 1;
+            totalQuestionsElement.textContent = questions.length;
+            
+            // Display question
+            questionElement.textContent = question.question;
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Add options
+            question.options.forEach((option, i) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.dataset.index = i;
+                optionElement.addEventListener('click', checkAnswer);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Start timer
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 20;
+            timerBar.style.width = '100%';
+            
+            timer = setInterval(() => {
+                timeLeft -= 0.1;
+                const percentage = (timeLeft / 20) * 100;
+                timerBar.style.width = `${percentage}%`;
+                
+                // Color changes based on time left
+                if (percentage < 30) {
+                    timerBar.style.backgroundColor = '#e74c3c'; // Red when time is running out
+                } else if (percentage < 60) {
+                    timerBar.style.backgroundColor = '#f39c12'; // Orange when at medium
+                } else {
+                    timerBar.style.backgroundColor = '#2ecc71'; // Green when plenty of time
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (!answered) {
+                        // Time's up - show correct answer
+                        const correctIndex = questions[currentQuestion].answer;
+                        const options = document.querySelectorAll('.option');
+                        options.forEach(option => {
+                            const optionIndex = parseInt(option.dataset.index);
+                            if (optionIndex === correctIndex) {
+                                option.classList.add('correct');
+                            }
+                            option.classList.add('disabled');
+                        });
+                        
+                        // Move to next question after delay
+                        setTimeout(() => {
+                            currentQuestion++;
+                            loadQuestion(currentQuestion);
+                        }, 1500);
+                    }
+                }
+            }, 100);
+        }
+
+        function checkAnswer(e) {
+            if (answered) return;
+            
+            answered = true;
+            clearInterval(timer);
+            
+            const selectedOption = e.target;
+            const selectedIndex = parseInt(selectedOption.dataset.index);
+            const correctIndex = questions[currentQuestion].answer;
+            
+            // Disable all options
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            // Check if answer is correct
+            if (selectedIndex === correctIndex) {
+                selectedOption.classList.add('correct');
+                score++;
+                scoreElement.textContent = score;
+            } else {
+                selectedOption.classList.add('incorrect');
+                // Show correct answer
+                options[correctIndex].classList.add('correct');
+            }
+            
+            // Move to next question after delay
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+            }, 1500);
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            finalScoreElement.textContent = score;
+        }
+
+        function restartQuiz() {
+            resultsContainer.style.display = 'none';
+            quizIntro.style.display = 'block';
+            topicSelector.value = '';
+            startButton.disabled = true;
+        }
+
+        // Handle clicks on disabled dropdown options
+        topicSelector.addEventListener('mousedown', function(e) {
+            const option = e.target.closest('option');
+            if (option && option.disabled && option.value) {
+                e.preventDefault();
+                this.blur();
+                showUpgradeModal();
+                return false;
+            }
+        });
+    </script>
 </body>
 </html>
